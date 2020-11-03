@@ -101,5 +101,7 @@ class ItemsController extends Controller
     public function destroy($id)
     {
         //
+        item::findOrFail($id)->delete();
+        return response()->json('Deleted data');
     }
 }

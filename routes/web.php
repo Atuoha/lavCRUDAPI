@@ -34,11 +34,15 @@ Route::get('/mail', function(){
 
 
 
-// Route::resource('/item', 'ItemsController');
-
-Route::post('/item/api', 'ItemsController@store');
-Route::put('/item/api/update/{id}', 'ItemsController@update');
-Route::delete('/item/api/delete/{id}', 'ItemsController@delete');
-Route::get('/item', 'ItemsController@index');
 
 
+// Route::post('/item/api', 'ItemsController@store');
+// Route::put('/item/api/update/{id}', 'ItemsController@update');
+// Route::delete('/item/api/delete/{id}', 'ItemsController@delete');
+// Route::get('/item', 'ItemsController@index');
+
+
+Route::group(['prefix' => 'api'], function()
+{
+    Route::resource('/item', 'ItemsController');
+});
