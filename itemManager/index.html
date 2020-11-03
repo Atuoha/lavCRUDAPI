@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ItemsManager</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-danger mb-3">
+        <div class="container">
+          <a href="#" class="navbar-brand"><i class="fa fa-shopping-cart"></i> ItemsManger </a>
+        </div>
+      </nav>
+      <div class="container">
+        Laravel ItemsAPI 
+        <div class="search card card-body ">
+          <h3>ItemsManager <i class="fa fa-shopping-cart"></i></h3>
+          <p class="lead">Enter an item to add</p>
+            <!-- Adding Form -->
+            <form action="" id="post_form" method="post">
+                <div class="form-group">
+                    <input type="text"  name="name" class="form-control" placeholder="Enter item name here..." required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <textarea name="body"  cols="4" rows="4" class="form-control" placeholder="Enter item content here...." required></textarea>
+                </div>
+
+                <button type="submit" id="btn" class="btn btn-primary"><i class="fa fa-plus"></i> Add item to collection</button>
+            </form>
+
+            <!-- Editing Form -->
+            <form action="" id="edit_form" method="post">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter item name here..." required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <textarea name="body" id="body" cols="4" rows="4" class="form-control" placeholder="Enter item content here...." required></textarea>
+                </div>
+
+                <button type="submit" id="btn" class="btn btn-success"><i class="fa fa-pencil"></i> Submit item to collection</button>
+
+                <a href="javascript:void(0)"  class="btn btn-info btn_cancel" ><i class="fa fa-remove"></i> No! Cancel Request</a>
+
+            </form>
+
+            <!-- Deleting Form -->
+            <form action="" id="del_form" method="post">
+                <button type="submit" id="btn" class="btn btn-warning"><i class="fa fa-check"></i> Yes! Delete item</button>
+                <a href="javascript:void(0)"  class="btn btn-info btn_cancel" ><i class="fa fa-remove"></i> No! Cancel Request</a>
+            </form>
+
+        </div>
+        <br>
+    
+        <p id="response"></p>
+        <div id="content">
+            <hr>
+           <ul class="list-group" id="items">
+                <!-- <li class="list-group-item">
+                    <strong>Hello</strong>
+                    - Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus et rem nesciunt animi nobis, incidunt cupiditate voluptatibus iusto eligendi eos ipsum id velit dolores ex distinctio cumque saepe voluptas aut.
+
+                    <a class="btn btn-success update_item" id="1" href="Body of content 1" rel="content 1"><i class="fa fa-pencil"></i> Update</a>
+
+                    <a class="btn btn-warning delete_item" id="1" rel="content 1"><i class="fa fa-remove"></i> Delete</a>
+                </li>
+
+
+                <li class="list-group-item">
+                    <strong>Hello</strong>
+                    - Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus et rem nesciunt animi nobis, incidunt cupiditate voluptatibus iusto eligendi eos ipsum id velit dolores ex distinctio cumque saepe voluptas aut.
+
+                    <a class="btn btn-success update_item" id="2" href="Body of content 2" rel="content 2"><i class="fa fa-pencil"></i> Update</a>
+
+                    <a class="btn btn-warning delete_item" id="2" rel="content 2"><i class="fa fa-remove"></i> Delete</a>
+                </li> -->
+           </ul>
+        </div>
+        
+      </div>
+    
+      <footer class="mt-5 p-3 text-center bg-light">
+        ItemManager &copy; 2020 <a target="_blank" style="color:black" href="https://www.facebook.com/atutechscorp">Atutechs Corp</a>
+      </footer>
+  
+
+<style>
+    #edit_form{
+        display:none;
+    }
+
+    #del_form{
+        display:none;
+    }
+
+</style>
+
+
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+
+
+    <script>
+        $(document).ready(function(){
+
+            getItems();
+            addItems();
+            updateItem();
+            deleteItem();
+            cancelRequest();
+
+            // get items
+            function getItems(){
+                $.ajax({
+                    url: 'http://itemsapi.test/item',
+                    type: 'Get',
+                    success: function(items){
+
+                        if(!items.error){
+                            let output = '';
+
+                            // looping through each item
+                            $.each(items, function(key, item){
+
+                               output += `
+                                <li class="list-group-item">
+                                    <strong> ${item.name}</strong> 
+                                    <br> - ${item.body} |  
+                                    <p class="text-small">Created at: ${item.created_at}</p>
+                                    <br>                                 
+                                    <a class="btn btn-success update_item" id="${item.id}"  href="${item.body}" rel="${item.name}"><i class="fa fa-pencil"></i> Update</a>
+
+                                    <a class="btn btn-warning delete_item" id="${item.id}" rel="${item.name}"><i class="fa fa-remove"></i> Delete</a>
+                                   
+                                </li>
+                               `       
+
+                            })    
+
+                            let content = $('#items');
+                            content.append(output);   
+                            console.log(output)     
+                    
+                        }
+                    }
+                })
+            }
+
+
+
+
+
+
+            // add items
+            function addItems(){
+                $('#post_form').submit(function(e){
+                    e.preventDefault();
+                    console.log('from adding')
+                    let data = $(this).serialize();
+                    let action = 'http://itemsapi.test/item/api';
+                    console.log(data)
+                   
+                    $.ajax({
+                        url: action,
+                        type: 'Post',
+                        data: data,
+                        success: function(response){
+                            if(!response.error){
+                                getItems();
+                                $('#response').html('Item added successfully :)');
+                                $('#response').attr('class', 'alert alert-success');
+                                $('#post_form').reset(); 
+                                
+
+                                setTimeout(() => {
+                                    clearResponse();
+                                }, 7000)
+                            }
+                        }
+                    })
+
+                })
+            }
+
+
+            // clear response alert msg
+            function clearResponse(){
+                $data = $('#response');
+                if($data){
+                    $data.fadeOut();
+                }
+            }
+
+
+
+
+
+            // update item
+            function updateItem(){
+
+                // obtaining data 
+                $('body').click(function(e){
+                   
+                    if(e.target.classList.contains('update_item')){
+                        e.preventDefault();
+                        let name = e.target.rel;
+                        let body = e.target.attributes.href.nodeValue;
+                        let id = e.target.id;
+                        console.log(name, body, id);
+
+                        $('#name').attr('value', name);
+                        $('#body').html(body);                   
+                        $('.lead').html(`<i class="fa fa-check-circle"></i> Editing item: ${name}`)   
+                        $('#edit_form').css('display','block');  
+                        $('#post_form').css('display','none');  
+                        $('#del_form').css('display','none');   
+                        $('#edit_form').attr('action',`http://itemsapi.test/item/api/update/${id}`);  
+
+
+                        let input = `<input type="hidden" name="_method" value="PUT">`;
+                        $('#edit_form').append(input)
+                    }
+                })
+
+                //updating
+                $('#edit_form').submit(function(e){
+                        e.preventDefault();
+                        console.log('from editing')
+                        let data = $(this).serialize();
+                        let action = $(this).attr('action');
+                        console.log(data)
+                   
+                        $.ajax({
+                            url: action,
+                            type: 'Post',
+                            data: data,
+                            success: function(response){
+                                if(!response.error){
+                                    getItems();
+                                    $('#response').html('Item updated successfully :)');
+                                    $('#response').attr('class', 'alert alert-success');
+                                    $('#post_form').css('display','block');  
+                                    $('#del_form').css('display','none');
+                                    $('#edit_form').css('display','none');
+                                    $('#edit_form').reset();  
+                                    
+
+                                    setTimeout(() => {
+                                        clearResponse();
+                                    }, 7000)
+                                }
+                            }
+                        })
+                })
+            }
+
+
+
+            // deleting item
+            function deleteItem(){
+                $('body').click(function(e){
+                
+                   if(e.target.classList.contains('delete_item')){
+                       let name = e.target.rel;
+                       let id = e.target.id;
+                       console.log(name, id);
+
+                       $('.lead').html(`<i class="fa fa-check-circle"></i> Do you want to delete item with name of: <b>${name}</b>`)   
+                       $('#edit_form').css('display','none');  
+                        $('#post_form').css('display','none');  
+                       $('#del_form').css('display', 'block')
+                       $('#del_form').attr('action',`http://itemsapi.test/item/api/delete/${id}`);
+                       let input = `<input type="hidden" name="_method" value="DELETE">`;
+                       $('#del_form').append(input)
+
+
+                       
+                   }
+
+                   $('#del_form').submit(function(e){
+                       e.preventDefault();
+                       let action = $(this).attr('action');
+                       let data = $(this).serialize();
+                       console.log(data);
+
+                       $.ajax({
+                           url: action,
+                           type: 'Post',
+                           success: function(response){
+                                if(!response.error){
+                                    getItems();
+                                    $('#response').html('Item Deleted successfully :)');
+                                    $('#response').attr('class', 'alert alert-success');
+
+                                    setTimeout(() => {
+                                        clearResponse();
+                                    }, 7000)
+                                }
+                           }
+                       })
+
+                   })
+               })
+            }
+
+
+
+            // cancel request
+            function cancelRequest(){
+               $('.btn_cancel').click(function(e){
+                   e.preventDefault()
+                   $('.lead').html(`<i class="fa fa-check-circle"></i> Enter item to add`)  
+                    $('#edit_form').css('display','none');  
+                    $('#post_form').css('display','block');  
+                    $('#del_form').css('display', 'none')
+               })
+            }
+           
+        })
+    </script>
+
+
+</body>
+</html>
